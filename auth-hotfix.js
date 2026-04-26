@@ -1,5 +1,5 @@
 (() => {
-  const PASSWORD = 'Brainrot2026';
+  const PASSWORD = 'chk123@';
   const SESSION_KEY = 'brainrot_vault_session';
   const USERS = {
     Cheikh: { username: 'Cheikh', displayName: 'Admi', role: 'admin' },
