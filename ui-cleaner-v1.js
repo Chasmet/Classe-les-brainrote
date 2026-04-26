@@ -1,26 +1,58 @@
 (() => {
   const HIDE_CLASS = 'hidden';
   let lastTap = 0;
+  let reflowTimer = null;
 
   function addStyle() {
-    if (document.getElementById('uiCleanerCssV2')) return;
+    if (document.getElementById('uiCleanerCssV3')) return;
     const style = document.createElement('style');
-    style.id = 'uiCleanerCssV2';
+    style.id = 'uiCleanerCssV3';
     style.textContent = `
       html, body {
         background: #071026 !important;
         overflow-x: hidden !important;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent !important;
+        touch-action: manipulation !important;
       }
 
-      button, .chip, .nav-btn, .slot-btn, .brainrot-card, .rarity-section {
-        touch-action: manipulation;
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background: #071026;
       }
 
-      button:active, .chip:active, .nav-btn:active {
-        transform: scale(.98);
-        filter: brightness(1.08);
+      .app-shell,
+      .auth-screen,
+      .views,
+      .view,
+      .panel,
+      .controls-panel,
+      .rarity-section,
+      .brainrot-card,
+      .bottom-nav,
+      .modal-sheet,
+      .block-panel,
+      .cases-panel-v2,
+      .case-edit-v2,
+      .custom-slot-panel,
+      .case-panel,
+      .case-edit-panel {
+        isolation: isolate !important;
+        backface-visibility: hidden !important;
+        transform: translateZ(0);
+      }
+
+      .app-shell,
+      .auth-screen,
+      .views {
+        background: #071026 !important;
+      }
+
+      .view {
+        background: #071026 !important;
+        min-height: 100dvh;
       }
 
       .view:not(.active) {
@@ -28,6 +60,9 @@
         visibility: hidden !important;
         pointer-events: none !important;
         opacity: 0 !important;
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: -1 !important;
       }
 
       .view.active {
@@ -35,6 +70,8 @@
         visibility: visible !important;
         pointer-events: auto !important;
         opacity: 1 !important;
+        position: relative !important;
+        z-index: 1 !important;
       }
 
       .modal-backdrop,
@@ -46,6 +83,20 @@
       .case-edit-panel {
         background: #071026 !important;
         z-index: 100000 !important;
+      }
+
+      .modal-backdrop {
+        background: rgba(2, 6, 18, .94) !important;
+      }
+
+      .modal-sheet,
+      .block-panel,
+      .cases-panel-v2,
+      .case-edit-v2,
+      .custom-slot-panel,
+      .case-panel,
+      .case-edit-panel {
+        background: #0b1430 !important;
       }
 
       .modal-backdrop.hidden,
@@ -61,24 +112,53 @@
         opacity: 0 !important;
       }
 
-      .modal-sheet {
-        background: #0b1430 !important;
-      }
-
       #collectionWrap,
       .collection-wrap,
-      .versions-grid {
-        contain: layout paint;
+      .versions-grid,
+      .custom-slots-grid,
+      #rarityChips,
+      #statusChips,
+      .stats-grid,
+      .version-stats-grid,
+      .recent-list {
+        contain: layout paint style !important;
+      }
+
+      .ui-redraw-force {
+        transform: translateZ(0) scale(1) !important;
+      }
+
+      button, .chip, .nav-btn, .slot-btn, .brainrot-card, .rarity-section {
+        touch-action: manipulation !important;
+      }
+
+      button:active, .chip:active, .nav-btn:active {
+        transform: scale(.98) translateZ(0) !important;
+        filter: brightness(1.08);
       }
     `;
     document.head.appendChild(style);
   }
 
-  function closeFloatingPanels() {
+  function hideElement(el) {
+    if (!el) return;
+    el.classList.add(HIDE_CLASS);
+    el.classList.remove('active', 'open', 'show');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.pointerEvents = 'none';
+  }
+
+  function closeFloatingPanels(except = null) {
     document.querySelectorAll('.modal-backdrop, .block-panel, .cases-panel-v2, .case-edit-v2, .custom-slot-panel, .case-panel, .case-edit-panel').forEach((el) => {
-      el.classList.add(HIDE_CLASS);
-      el.classList.remove('active', 'open');
-      el.setAttribute('aria-hidden', 'true');
+      if (except && el === except) return;
+      hideElement(el);
+    });
+  }
+
+  function removeDuplicateLayers() {
+    ['blockPanel', 'casesPanelV2', 'caseEditV2', 'customSlotPanel', 'casePanel', 'caseEditPanel', 'imageLightboxV2'].forEach((id) => {
+      const items = Array.from(document.querySelectorAll(`#${CSS.escape(id)}`));
+      items.slice(0, -1).forEach((node) => node.remove());
     });
   }
 
@@ -86,27 +166,49 @@
     const target = document.getElementById(`view-${viewName}`) || document.getElementById(`${viewName}View`);
     if (!target) return;
 
+    closeFloatingPanels();
+    removeDuplicateLayers();
+
     document.querySelectorAll('.view').forEach((view) => {
       const active = view === target;
       view.classList.toggle('active', active);
       view.style.display = active ? 'block' : 'none';
       view.style.visibility = active ? 'visible' : 'hidden';
       view.style.pointerEvents = active ? 'auto' : 'none';
+      view.style.opacity = active ? '1' : '0';
+      view.setAttribute('aria-hidden', active ? 'false' : 'true');
     });
 
     document.querySelectorAll('[data-view]').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.view === viewName);
     });
+
+    forceParentInvalidate(target);
   }
 
-  function softReflow() {
-    requestAnimationFrame(() => {
-      const wrap = document.getElementById('collectionWrap');
-      if (!wrap) return;
-      wrap.style.transform = 'translateZ(0)';
-      void wrap.offsetHeight;
-      wrap.style.transform = '';
-    });
+  function forceParentInvalidate(target) {
+    clearTimeout(reflowTimer);
+    reflowTimer = setTimeout(() => {
+      const nodes = [
+        target,
+        document.getElementById('appScreen'),
+        document.getElementById('collectionWrap'),
+        ...document.querySelectorAll('.collection-wrap, .versions-grid, .custom-slots-grid, .rarity-section, .brainrot-card')
+      ].filter(Boolean);
+
+      nodes.forEach((node) => {
+        node.classList.add('ui-redraw-force');
+        node.style.willChange = 'transform';
+        void node.offsetHeight;
+      });
+
+      requestAnimationFrame(() => {
+        nodes.forEach((node) => {
+          node.style.willChange = '';
+          node.classList.remove('ui-redraw-force');
+        });
+      });
+    }, 25);
   }
 
   function patchNavigation() {
@@ -114,9 +216,11 @@
       const nav = event.target.closest('[data-view]');
       if (!nav) return;
       const view = nav.dataset.view;
-      closeFloatingPanels();
       if (view && view !== 'logout') showOnlyView(view);
-      softReflow();
+      else {
+        closeFloatingPanels();
+        forceParentInvalidate(document.body);
+      }
     }, true);
   }
 
@@ -125,13 +229,36 @@
       const close = event.target.closest('[data-close-modal], .block-close, .case-close, .case-close-v2, .cases-close-v2');
       if (!close) return;
       const panel = close.closest('.modal-backdrop, .block-panel, .cases-panel-v2, .case-edit-v2, .custom-slot-panel, .case-panel, .case-edit-panel');
-      if (panel) {
-        panel.classList.add(HIDE_CLASS);
-        panel.classList.remove('active', 'open');
-        panel.setAttribute('aria-hidden', 'true');
-      }
-      softReflow();
+      hideElement(panel);
+      forceParentInvalidate(document.body);
     }, true);
+
+    document.addEventListener('click', (event) => {
+      const backdrop = event.target.closest('.modal-backdrop');
+      if (backdrop && event.target === backdrop) {
+        hideElement(backdrop);
+        forceParentInvalidate(document.body);
+      }
+    }, true);
+  }
+
+  function patchListActions() {
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('button, .chip, .slot-btn, .custom-case-card-v2, .custom-slot-btn')) return;
+      forceParentInvalidate(document.getElementById('collectionWrap') || document.body);
+    }, true);
+
+    document.addEventListener('change', () => {
+      forceParentInvalidate(document.getElementById('collectionWrap') || document.body);
+    }, true);
+  }
+
+  function observeCollection() {
+    const wrap = document.getElementById('collectionWrap');
+    if (!wrap || wrap.dataset.redrawObserver === '1') return;
+    wrap.dataset.redrawObserver = '1';
+    const observer = new MutationObserver(() => forceParentInvalidate(wrap));
+    observer.observe(wrap, { childList: true, subtree: true });
   }
 
   function removeDoubleTapZoomLag() {
@@ -155,10 +282,17 @@
     addStyle();
     patchNavigation();
     patchCloseButtons();
+    patchListActions();
     removeDoubleTapZoomLag();
-    softReflow();
+    observeCollection();
+    closeFloatingPanels();
+    forceParentInvalidate(document.body);
     loadScriptOnce('access-v2.js?v=2', 'accessV2Script');
   }
 
-  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 250));
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 250));
+  } else {
+    setTimeout(boot, 250);
+  }
 })();
