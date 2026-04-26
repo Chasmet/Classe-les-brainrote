@@ -142,12 +142,22 @@
     }, { passive: false });
   }
 
+  function loadScriptOnce(src, id) {
+    if (document.getElementById(id)) return;
+    const script = document.createElement('script');
+    script.id = id;
+    script.src = src;
+    script.defer = true;
+    document.body.appendChild(script);
+  }
+
   function boot() {
     addStyle();
     patchNavigation();
     patchCloseButtons();
     removeDoubleTapZoomLag();
     softReflow();
+    loadScriptOnce('access-v2.js?v=2', 'accessV2Script');
   }
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 250));
