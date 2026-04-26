@@ -1,46 +1,26 @@
 (() => {
-  const OPEN_CLASSES = ['active', 'open'];
   const HIDE_CLASS = 'hidden';
-  let renderTimer = null;
+  let lastTap = 0;
 
   function addStyle() {
-    if (document.getElementById('uiCleanerCssV1')) return;
+    if (document.getElementById('uiCleanerCssV2')) return;
     const style = document.createElement('style');
-    style.id = 'uiCleanerCssV1';
+    style.id = 'uiCleanerCssV2';
     style.textContent = `
       html, body {
         background: #071026 !important;
         overflow-x: hidden !important;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
       }
 
-      .app-shell,
-      .auth-screen,
-      .view,
-      .modal-backdrop,
-      .modal-sheet,
-      .block-panel,
-      .cases-panel-v2,
-      .case-edit-v2,
-      .custom-slot-panel,
-      .case-panel,
-      .case-edit-panel,
-      .bottom-nav,
-      .panel,
-      .brainrot-card,
-      .rarity-section {
-        isolation: isolate;
-        backface-visibility: hidden;
-        transform: translateZ(0);
+      button, .chip, .nav-btn, .slot-btn, .brainrot-card, .rarity-section {
+        touch-action: manipulation;
       }
 
-      .app-shell,
-      .auth-screen {
-        background: #071026 !important;
-        min-height: 100dvh;
-      }
-
-      .view {
-        background: transparent;
+      button:active, .chip:active, .nav-btn:active {
+        transform: scale(.98);
+        filter: brightness(1.08);
       }
 
       .view:not(.active) {
@@ -85,171 +65,90 @@
         background: #0b1430 !important;
       }
 
-      .collection-wrap,
-      .versions-grid,
-      .stats-grid,
-      .version-stats-grid,
-      .recent-list,
       #collectionWrap,
-      #rarityChips,
-      #statusChips {
-        contain: layout paint style;
-      }
-
-      .ui-reflowing * {
-        transition: none !important;
-        animation-duration: .001s !important;
+      .collection-wrap,
+      .versions-grid {
+        contain: layout paint;
       }
     `;
     document.head.appendChild(style);
   }
 
-  function closeAllFloating(except = null) {
-    const floatingSelectors = [
-      '.modal-backdrop',
-      '.block-panel',
-      '.cases-panel-v2',
-      '.case-edit-v2',
-      '.custom-slot-panel',
-      '.case-panel',
-      '.case-edit-panel'
-    ];
-
-    document.querySelectorAll(floatingSelectors.join(',')).forEach((element) => {
-      if (except && element === except) return;
-      element.classList.add(HIDE_CLASS);
-      OPEN_CLASSES.forEach(cls => element.classList.remove(cls));
-      element.setAttribute('aria-hidden', 'true');
+  function closeFloatingPanels() {
+    document.querySelectorAll('.modal-backdrop, .block-panel, .cases-panel-v2, .case-edit-v2, .custom-slot-panel, .case-panel, .case-edit-panel').forEach((el) => {
+      el.classList.add(HIDE_CLASS);
+      el.classList.remove('active', 'open');
+      el.setAttribute('aria-hidden', 'true');
     });
   }
 
-  function clearNavigationStack(targetViewId = null) {
+  function showOnlyView(viewName) {
+    const target = document.getElementById(`view-${viewName}`) || document.getElementById(`${viewName}View`);
+    if (!target) return;
+
     document.querySelectorAll('.view').forEach((view) => {
-      const isTarget = targetViewId && view.id === targetViewId;
-      view.classList.toggle('active', isTarget);
-      view.style.display = isTarget ? 'block' : 'none';
-      view.style.visibility = isTarget ? 'visible' : 'hidden';
-      view.style.pointerEvents = isTarget ? 'auto' : 'none';
-      view.setAttribute('aria-hidden', isTarget ? 'false' : 'true');
+      const active = view === target;
+      view.classList.toggle('active', active);
+      view.style.display = active ? 'block' : 'none';
+      view.style.visibility = active ? 'visible' : 'hidden';
+      view.style.pointerEvents = active ? 'auto' : 'none';
+    });
+
+    document.querySelectorAll('[data-view]').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.view === viewName);
     });
   }
 
-  function purgeDuplicateFloating() {
-    const uniqueIds = ['blockPanel', 'casePanel', 'caseEditPanel', 'casesPanelV2', 'caseEditV2', 'customSlotPanel'];
-    uniqueIds.forEach((id) => {
-      const nodes = [...document.querySelectorAll(`#${CSS.escape(id)}`)];
-      nodes.slice(0, -1).forEach(node => node.remove());
+  function softReflow() {
+    requestAnimationFrame(() => {
+      const wrap = document.getElementById('collectionWrap');
+      if (!wrap) return;
+      wrap.style.transform = 'translateZ(0)';
+      void wrap.offsetHeight;
+      wrap.style.transform = '';
     });
-  }
-
-  function invalidateLayout() {
-    clearTimeout(renderTimer);
-    renderTimer = setTimeout(() => {
-      document.documentElement.classList.add('ui-reflowing');
-
-      purgeDuplicateFloating();
-
-      const repaintTargets = [
-        '#collectionWrap',
-        '.collection-wrap',
-        '.versions-grid',
-        '#rarityChips',
-        '#statusChips',
-        '.stats-grid',
-        '.version-stats-grid',
-        '.recent-list'
-      ];
-
-      document.querySelectorAll(repaintTargets.join(',')).forEach((node) => {
-        node.style.contain = 'none';
-        void node.offsetHeight;
-        node.style.contain = 'layout paint style';
-      });
-
-      requestAnimationFrame(() => {
-        document.documentElement.classList.remove('ui-reflowing');
-      });
-    }, 40);
   }
 
   function patchNavigation() {
     document.addEventListener('click', (event) => {
       const nav = event.target.closest('[data-view]');
       if (!nav) return;
-
       const view = nav.dataset.view;
-      if (!view || view === 'logout') {
-        closeAllFloating();
-        invalidateLayout();
-        return;
-      }
-
-      const target = document.getElementById(`view-${view}`) || document.getElementById(`${view}View`);
-      if (!target) return;
-
-      closeAllFloating();
-      clearNavigationStack(target.id);
-
-      document.querySelectorAll('[data-view]').forEach(btn => btn.classList.toggle('active', btn === nav));
-      invalidateLayout();
+      closeFloatingPanels();
+      if (view && view !== 'logout') showOnlyView(view);
+      softReflow();
     }, true);
   }
 
-  function patchPopupClose() {
+  function patchCloseButtons() {
     document.addEventListener('click', (event) => {
-      const closeBtn = event.target.closest('[data-close-modal], .block-close, .case-close, .case-close-v2, .cases-close-v2');
-      if (!closeBtn) return;
-
-      const floating = closeBtn.closest('.modal-backdrop, .block-panel, .cases-panel-v2, .case-edit-v2, .custom-slot-panel, .case-panel, .case-edit-panel');
-      if (floating) {
-        floating.classList.add(HIDE_CLASS);
-        OPEN_CLASSES.forEach(cls => floating.classList.remove(cls));
-        floating.setAttribute('aria-hidden', 'true');
+      const close = event.target.closest('[data-close-modal], .block-close, .case-close, .case-close-v2, .cases-close-v2');
+      if (!close) return;
+      const panel = close.closest('.modal-backdrop, .block-panel, .cases-panel-v2, .case-edit-v2, .custom-slot-panel, .case-panel, .case-edit-panel');
+      if (panel) {
+        panel.classList.add(HIDE_CLASS);
+        panel.classList.remove('active', 'open');
+        panel.setAttribute('aria-hidden', 'true');
       }
-
-      invalidateLayout();
-    }, true);
-
-    document.addEventListener('click', (event) => {
-      const backdrop = event.target.closest('.modal-backdrop');
-      if (backdrop && event.target === backdrop) {
-        backdrop.classList.add(HIDE_CLASS);
-        backdrop.setAttribute('aria-hidden', 'true');
-        invalidateLayout();
-      }
+      softReflow();
     }, true);
   }
 
-  function observeRenderMutations() {
-    const target = document.getElementById('collectionWrap') || document.body;
-    const observer = new MutationObserver(() => invalidateLayout());
-    observer.observe(target, { childList: true, subtree: true });
-  }
-
-  function patchProgrammaticRender() {
-    ['renderAll', 'renderCollection', 'renderStats'].forEach((name) => {
-      if (typeof window[name] !== 'function' || window[name]._uiCleaned) return;
-      const original = window[name];
-      const patched = function (...args) {
-        const result = original.apply(this, args);
-        invalidateLayout();
-        return result;
-      };
-      patched._uiCleaned = true;
-      window[name] = patched;
-    });
+  function removeDoubleTapZoomLag() {
+    document.addEventListener('touchend', (event) => {
+      const now = Date.now();
+      if (now - lastTap < 280) event.preventDefault();
+      lastTap = now;
+    }, { passive: false });
   }
 
   function boot() {
     addStyle();
-    closeAllFloating();
     patchNavigation();
-    patchPopupClose();
-    observeRenderMutations();
-    setInterval(patchProgrammaticRender, 800);
-    setInterval(invalidateLayout, 1600);
-    invalidateLayout();
+    patchCloseButtons();
+    removeDoubleTapZoomLag();
+    softReflow();
   }
 
-  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 300));
+  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 250));
 })();
