@@ -2,7 +2,6 @@
   const LIMIT_KEY = 'brainrot_fluid_limits_v1';
   const DEFAULT_LIMIT = 2;
   const STEP = 3;
-
   let limits = loadLimits();
 
   function loadLimits() {
@@ -32,7 +31,6 @@
         font-weight: 800;
         text-align: center;
       }
-
       .fluid-load-btn {
         width: 100%;
         min-height: 54px;
@@ -45,7 +43,6 @@
         font-size: 16px;
         touch-action: manipulation;
       }
-
       .fluid-count {
         display: block;
         margin-top: 6px;
@@ -58,11 +55,11 @@
   }
 
   function ready() {
-    return typeof window.renderCollection === 'function'
-      && typeof window.getFilteredBrainrots === 'function'
-      && typeof window.renderBrainrotCard === 'function'
-      && window.ui
-      && window.ui.collectionWrap;
+    return typeof renderCollection === 'function'
+      && typeof getFilteredBrainrots === 'function'
+      && typeof renderBrainrotCard === 'function'
+      && typeof ui !== 'undefined'
+      && ui.collectionWrap;
   }
 
   function patchRenderCollection() {
@@ -70,7 +67,7 @@
     if (window.__brainrotFluidRenderPatched) return true;
     window.__brainrotFluidRenderPatched = true;
 
-    window.renderCollection = function renderCollectionFluid() {
+    renderCollection = function renderCollectionFluid() {
       const filtered = getFilteredBrainrots();
 
       if (!filtered.length) {
@@ -100,7 +97,6 @@
         const currentLimit = Number(limits[rarity] || DEFAULT_LIMIT);
         const visibleItems = items.slice(0, currentLimit);
         const hiddenCount = Math.max(0, items.length - visibleItems.length);
-
         const total = items.length * VERSION_ORDER.length;
         const owned = items.reduce((sum, brainrot) => sum + getBrainrotOwnedCount(brainrot), 0);
         const progress = total ? Math.round((owned / total) * 100) : 0;
@@ -113,7 +109,6 @@
                 <h3>${RARITY_LABELS[rarity]}</h3>
                 <div class="section-meta">${items.length} brainrot${items.length > 1 ? 's' : ''}${extraMeta}</div>
               </div>
-
               <div class="section-progress">
                 <div class="section-meta">${owned} / ${total} versions</div>
                 <div class="progress-track">
@@ -121,9 +116,7 @@
                 </div>
               </div>
             </div>
-
             ${visibleItems.map(renderBrainrotCard).join('')}
-
             ${hiddenCount > 0 ? `
               <button class="fluid-load-btn" type="button" data-fluid-more="${rarity}">
                 Afficher ${Math.min(STEP, hiddenCount)} de plus
@@ -141,10 +134,10 @@
       const rarity = btn.dataset.fluidMore;
       limits[rarity] = Number(limits[rarity] || DEFAULT_LIMIT) + STEP;
       saveLimits();
-      window.renderCollection();
+      renderCollection();
     });
 
-    window.renderCollection();
+    renderCollection();
     return true;
   }
 
@@ -153,9 +146,9 @@
     let attempts = 0;
     const timer = setInterval(() => {
       attempts += 1;
-      if (patchRenderCollection() || attempts > 30) clearInterval(timer);
+      if (patchRenderCollection() || attempts > 40) clearInterval(timer);
     }, 120);
   }
 
-  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 300));
+  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 250));
 })();
