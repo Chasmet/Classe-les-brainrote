@@ -1,0 +1,89 @@
+/* Brainrot Vault - correctif tactile mobile */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  touch-action: pan-y;
+}
+
+button,
+[role="button"],
+a,
+.nav-btn,
+.chip,
+.summary-card,
+.setting-card,
+.slot-btn,
+.favorite-btn,
+.mini-btn,
+.primary-btn,
+.ghost-btn,
+.soft-btn,
+.icon-btn,
+.fab {
+  touch-action: manipulation !important;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+select,
+textarea {
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hidden,
+[hidden] {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.hidden-file-input {
+  position: fixed !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+.modal-backdrop.hidden,
+.auth-screen.hidden,
+.app-shell.hidden {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.modal-backdrop:not(.hidden) {
+  pointer-events: auto !important;
+}
+
+.bottom-nav,
+.fab {
+  pointer-events: auto !important;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+.bg-art,
+.bg-overlay,
+.hero-bubble {
+  pointer-events: none !important;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
