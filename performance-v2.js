@@ -36,6 +36,91 @@
     const style = document.createElement('style');
     style.id = 'performanceV2Css';
     style.textContent = `
+      html, body {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        touch-action: pan-y !important;
+        overscroll-behavior-x: none !important;
+      }
+      .app-shell,
+      .auth-screen,
+      .views,
+      .view,
+      .hero,
+      .panel,
+      .controls-panel,
+      .collection-wrap,
+      .rarity-section,
+      .brainrot-card,
+      .summary-grid,
+      .stats-grid,
+      .version-stats-grid,
+      .settings-list,
+      .recent-list {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+      }
+      .app-shell { overflow-x: hidden !important; }
+      .hero,
+      .panel,
+      .rarity-section,
+      .brainrot-card,
+      .summary-card,
+      .slot-btn,
+      .custom-case-card-v2,
+      .custom-slot-btn {
+        contain: layout paint !important;
+      }
+      .chip-row,
+      .hero-pills {
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-x: contain !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .chip-row > *,
+      .hero-pills > * { flex-shrink: 0 !important; }
+      .versions-grid,
+      .custom-slots-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+      }
+      .slot-btn,
+      .custom-case-card-v2,
+      .custom-slot-btn {
+        min-width: 0 !important;
+        width: 100% !important;
+      }
+      .slot-thumb,
+      .slot-placeholder,
+      .custom-case-card-v2 img,
+      .custom-slot-btn img { max-width: 100% !important; }
+      .bottom-nav {
+        max-width: calc(100vw - 20px) !important;
+        overflow: hidden !important;
+      }
+      .modal-backdrop,
+      .modal-sheet,
+      .block-panel,
+      .cases-panel-v2,
+      .case-edit-v2,
+      .custom-slot-panel,
+      .case-panel,
+      .case-edit-panel {
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+      }
+      .modal-sheet,
+      .block-panel,
+      .cases-panel-v2,
+      .case-edit-v2,
+      .custom-slot-panel,
+      .case-panel,
+      .case-edit-panel { width: auto !important; }
       html.perf-low *,
       html.perf-low *::before,
       html.perf-low *::after {
@@ -48,9 +133,7 @@
       html.perf-low .rarity-section,
       html.perf-low .panel,
       html.perf-low .bottom-nav,
-      html.perf-low .summary-card {
-        box-shadow: none !important;
-      }
+      html.perf-low .summary-card { box-shadow: none !important; }
       .image-lightbox-v2 {
         position: fixed;
         inset: 0;
@@ -103,6 +186,15 @@
         color: #fff;
         font-weight: 900;
       }
+      @media (max-width: 430px) {
+        .app-shell { padding-left: 0 !important; padding-right: 0 !important; }
+        .hero { margin-left: 10px !important; margin-right: 10px !important; width: auto !important; }
+        .views { padding-left: 10px !important; padding-right: 10px !important; }
+        .panel-heading,
+        .section-header,
+        .card-head { min-width: 0 !important; }
+        .card-actions { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -113,6 +205,20 @@
     const low = typeof forced === 'boolean' ? forced : autoLow;
     document.documentElement.classList.toggle('perf-low', low);
     return low;
+  }
+
+  function lockHorizontalScroll() {
+    const reset = () => {
+      if (window.scrollX !== 0) window.scrollTo(0, window.scrollY || document.documentElement.scrollTop || 0);
+      document.documentElement.scrollLeft = 0;
+      document.body.scrollLeft = 0;
+    };
+    reset();
+    window.addEventListener('scroll', reset, { passive: true });
+    window.addEventListener('resize', reset, { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(reset, 250), { passive: true });
+    const observer = new MutationObserver(() => requestAnimationFrame(reset));
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
   }
 
   async function compressImageFile(file) {
@@ -238,6 +344,7 @@
   function boot() {
     addStyle();
     applyMode();
+    lockHorizontalScroll();
     patchFileReaderCompression();
     addImageLightbox();
     addPerfToolbar();
