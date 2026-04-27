@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brainrot-vault-v12-touch';
+const CACHE_NAME = 'brainrot-vault-v13-no-fluid';
 
 const ASSETS = [
   './',
@@ -15,7 +15,6 @@ const ASSETS = [
   './cases-ui-fix-v2.js',
   './ui-cleaner-v1.js',
   './performance-v2.js',
-  './fluid-render-v1.js',
   './manifest.json',
   './logo.png',
   './hero.png',
