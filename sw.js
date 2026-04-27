@@ -1,10 +1,11 @@
-const CACHE_NAME = 'brainrot-vault-v11-fluid';
+const CACHE_NAME = 'brainrot-vault-v12-touch';
 
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './mobile-ux-polish-v1.css',
+  './touch-fix-v1.css',
   './script.js',
   './auth-hotfix.js',
   './rarity-hotfix.js',
