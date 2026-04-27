@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brainrot-vault-v18-images-integrated';
+const CACHE_NAME = 'brainrot-vault-v19-selected-image';
 
 const ASSETS = [
   './',
