@@ -26,7 +26,8 @@ a,
 .ghost-btn,
 .soft-btn,
 .icon-btn,
-.fab {
+.fab,
+.action-main {
   touch-action: manipulation !important;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -71,11 +72,52 @@ textarea {
   pointer-events: auto !important;
 }
 
+.app-shell {
+  min-height: 100dvh;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.collection-wrap,
+.panel,
+.summary-card,
+.hero,
+.brainrot-card,
+.rarity-section,
+.bottom-nav,
+.fab {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.slot-btn,
+.custom-slot-btn {
+  min-height: 154px !important;
+}
+
+.slot-thumb,
+.slot-placeholder,
+.slot-preview {
+  width: 100% !important;
+  min-height: 112px !important;
+  height: 112px !important;
+  contain: layout paint;
+}
+
+.slot-thumb img,
+.slot-preview img,
+.custom-slot-btn img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
 .bottom-nav,
 .fab {
   pointer-events: auto !important;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 .bg-art,
@@ -86,4 +128,5 @@ textarea {
 
 * {
   -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
