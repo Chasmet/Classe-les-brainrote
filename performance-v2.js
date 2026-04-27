@@ -19,7 +19,7 @@
   function isLowDevice() {
     const memory = navigator.deviceMemory || 4;
     const cores = navigator.hardwareConcurrency || 4;
-    return memory <= 4 || cores <= 4;
+    return memory <= 6 || cores <= 6;
   }
 
   function toast(message) {
@@ -28,7 +28,7 @@
     t.textContent = message;
     t.classList.remove('hidden');
     clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.add('hidden'), 2200);
+    t._timer = setTimeout(() => t.classList.add('hidden'), 1600);
   }
 
   function addStyle() {
@@ -36,13 +36,33 @@
     const style = document.createElement('style');
     style.id = 'performanceV2Css';
     style.textContent = `
-      html, body {
+      html,
+      body {
         width: 100% !important;
         max-width: 100% !important;
         overflow-x: hidden !important;
-        touch-action: pan-y !important;
         overscroll-behavior-x: none !important;
+        scroll-behavior: auto !important;
       }
+
+      body {
+        touch-action: pan-y !important;
+        background: #071026 !important;
+      }
+
+      button,
+      input,
+      select,
+      textarea,
+      .slot-btn,
+      .chip,
+      .nav-btn,
+      .setting-card,
+      .favorite-btn,
+      .mini-btn {
+        touch-action: manipulation !important;
+      }
+
       .app-shell,
       .auth-screen,
       .views,
@@ -58,82 +78,84 @@
       .version-stats-grid,
       .settings-list,
       .recent-list {
-        width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
       }
-      .app-shell { overflow-x: hidden !important; }
-      .hero,
-      .panel,
-      .rarity-section,
-      .brainrot-card,
-      .summary-card,
-      .slot-btn,
-      .custom-case-card-v2,
-      .custom-slot-btn {
-        contain: layout paint !important;
+
+      .app-shell,
+      .views,
+      .collection-wrap {
+        overflow-x: hidden !important;
       }
+
       .chip-row,
       .hero-pills {
-        max-width: 100% !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
-        overscroll-behavior-x: contain !important;
         -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-x: contain !important;
       }
-      .chip-row > *,
-      .hero-pills > * { flex-shrink: 0 !important; }
+
       .versions-grid,
       .custom-slots-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        max-width: 100% !important;
-        overflow: hidden !important;
+        gap: 10px !important;
       }
+
       .slot-btn,
       .custom-case-card-v2,
       .custom-slot-btn {
         min-width: 0 !important;
         width: 100% !important;
       }
+
       .slot-thumb,
       .slot-placeholder,
       .custom-case-card-v2 img,
-      .custom-slot-btn img { max-width: 100% !important; }
+      .custom-slot-btn img {
+        max-width: 100% !important;
+      }
+
       .bottom-nav {
         max-width: calc(100vw - 20px) !important;
         overflow: hidden !important;
       }
-      .modal-backdrop,
-      .modal-sheet,
-      .block-panel,
-      .cases-panel-v2,
-      .case-edit-v2,
-      .custom-slot-panel,
-      .case-panel,
-      .case-edit-panel {
-        max-width: 100vw !important;
-        overflow-x: hidden !important;
+
+      .bg-art,
+      .bg-overlay,
+      .hero-bubble,
+      .bubble-1,
+      .bubble-2,
+      .bubble-3 {
+        display: none !important;
       }
-      .modal-sheet,
-      .block-panel,
-      .cases-panel-v2,
-      .case-edit-v2,
-      .custom-slot-panel,
-      .case-panel,
-      .case-edit-panel { width: auto !important; }
-      html.perf-low *,
-      html.perf-low *::before,
-      html.perf-low *::after {
-        animation: none !important;
-        transition-duration: .01ms !important;
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+
+      .brainrot-card,
+      .rarity-section,
+      .panel,
+      .bottom-nav,
+      .summary-card,
+      .slot-btn,
+      .custom-case-card-v2,
+      .custom-slot-btn,
+      .auth-card,
+      .modal-sheet {
+        box-shadow: none !important;
         backdrop-filter: none !important;
         filter: none !important;
+        transform: none !important;
+        will-change: auto !important;
       }
-      html.perf-low .brainrot-card,
-      html.perf-low .rarity-section,
-      html.perf-low .panel,
-      html.perf-low .bottom-nav,
-      html.perf-low .summary-card { box-shadow: none !important; }
+
       .image-lightbox-v2 {
         position: fixed;
         inset: 0;
@@ -144,13 +166,18 @@
         padding: 16px;
         background: rgba(2,6,18,.94);
       }
-      .image-lightbox-v2.open { display: flex; }
+
+      .image-lightbox-v2.open {
+        display: flex;
+      }
+
       .image-lightbox-v2 img {
         max-width: 100%;
         max-height: 86vh;
         object-fit: contain;
         border-radius: 20px;
       }
+
       .image-lightbox-v2 button {
         position: fixed;
         top: 16px;
@@ -164,6 +191,7 @@
         font-size: 24px;
         font-weight: 900;
       }
+
       .perf-toolbar {
         position: fixed;
         left: 12px;
@@ -177,7 +205,12 @@
         background: rgba(7,16,38,.96);
         border: 1px solid rgba(255,255,255,.14);
       }
-      .perf-toolbar.show { display: grid; grid-template-columns: 1fr 1fr; }
+
+      .perf-toolbar.show {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
       .perf-toolbar button {
         min-height: 46px;
         border: 0;
@@ -186,14 +219,23 @@
         color: #fff;
         font-weight: 900;
       }
+
       @media (max-width: 430px) {
-        .app-shell { padding-left: 0 !important; padding-right: 0 !important; }
-        .hero { margin-left: 10px !important; margin-right: 10px !important; width: auto !important; }
-        .views { padding-left: 10px !important; padding-right: 10px !important; }
-        .panel-heading,
-        .section-header,
-        .card-head { min-width: 0 !important; }
-        .card-actions { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        .app-shell {
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+        }
+
+        .hero {
+          margin-left: 10px !important;
+          margin-right: 10px !important;
+          width: auto !important;
+        }
+
+        .views {
+          padding-left: 10px !important;
+          padding-right: 10px !important;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -209,23 +251,23 @@
 
   function lockHorizontalScroll() {
     const reset = () => {
-      if (window.scrollX !== 0) window.scrollTo(0, window.scrollY || document.documentElement.scrollTop || 0);
+      if (window.scrollX !== 0) {
+        window.scrollTo(0, window.scrollY || document.documentElement.scrollTop || 0);
+      }
       document.documentElement.scrollLeft = 0;
       document.body.scrollLeft = 0;
     };
+
     reset();
-    window.addEventListener('scroll', reset, { passive: true });
     window.addEventListener('resize', reset, { passive: true });
     window.addEventListener('orientationchange', () => setTimeout(reset, 250), { passive: true });
-    const observer = new MutationObserver(() => requestAnimationFrame(reset));
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
   }
 
   async function compressImageFile(file) {
     if (!file || !file.type || !file.type.startsWith('image/')) return null;
     const low = applyMode();
-    const maxSize = low ? 760 : 1100;
-    const quality = low ? 0.64 : 0.72;
+    const maxSize = low ? 680 : 900;
+    const quality = low ? 0.58 : 0.66;
     const rawDataUrl = await fileToDataUrl(file);
     const img = await loadImage(rawDataUrl);
     const ratio = Math.min(1, maxSize / Math.max(img.width, img.height));
@@ -236,7 +278,7 @@
     canvas.height = height;
     const ctx = canvas.getContext('2d', { alpha: false });
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = low ? 'medium' : 'high';
+    ctx.imageSmoothingQuality = 'medium';
     ctx.drawImage(img, 0, 0, width, height);
     try {
       const webp = canvas.toDataURL('image/webp', quality);
@@ -278,7 +320,7 @@
           const endEvent = new ProgressEvent('loadend');
           if (typeof reader.onloadend === 'function') reader.onloadend(endEvent);
           reader.dispatchEvent(endEvent);
-          if (file.size > 800000) toast('Image compressée automatiquement.');
+          if (file.size > 800000) toast('Image compressée pour fluidifier.');
         })
         .catch(() => ORIGINAL_READ.call(reader, file));
     };
@@ -300,7 +342,7 @@
       if (!src) return;
       box.querySelector('img').src = src;
       box.classList.add('open');
-    });
+    }, { passive: true });
   }
 
   function addPerfToolbar() {
@@ -328,9 +370,9 @@
       const settingsBtn = event.target.closest('[data-view="settings"]');
       if (!settingsBtn) return;
       pressTimer = setTimeout(() => document.dispatchEvent(new Event('longpress-settings')), 900);
-    });
-    document.addEventListener('pointerup', () => clearTimeout(pressTimer));
-    document.addEventListener('pointercancel', () => clearTimeout(pressTimer));
+    }, { passive: true });
+    document.addEventListener('pointerup', () => clearTimeout(pressTimer), { passive: true });
+    document.addEventListener('pointercancel', () => clearTimeout(pressTimer), { passive: true });
   }
 
   function autoLoadV4() {
@@ -351,5 +393,5 @@
     autoLoadV4();
   }
 
-  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 200));
+  document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 80));
 })();
