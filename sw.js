@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brainrot-vault-v16-clean-active';
+const CACHE_NAME = 'brainrot-vault-v17-neon-design';
 
 const ASSETS = [
   './',
