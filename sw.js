@@ -1,20 +1,11 @@
-const CACHE_NAME = 'brainrot-vault-v13-no-fluid';
+const CACHE_NAME = 'brainrot-vault-v14-simple-fast';
 
 const ASSETS = [
   './',
   './index.html',
   './style.css',
-  './mobile-ux-polish-v1.css',
   './touch-fix-v1.css',
   './script.js',
-  './auth-hotfix.js',
-  './rarity-hotfix.js',
-  './rarity-blocks-v7.js',
-  './rarity-delete-fix.js',
-  './cases-manager-v1.js',
-  './cases-ui-fix-v2.js',
-  './ui-cleaner-v1.js',
-  './performance-v2.js',
   './manifest.json',
   './logo.png',
   './hero.png',
