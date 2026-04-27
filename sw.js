@@ -1,10 +1,9 @@
-const CACHE_NAME = 'brainrot-vault-v15-cases-lite';
+const CACHE_NAME = 'brainrot-vault-v16-clean-active';
 
 const ASSETS = [
   './',
   './index.html',
   './style.css',
-  './touch-fix-v1.css',
   './script.js',
   './cases-lite-v1.js',
   './manifest.json',
