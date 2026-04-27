@@ -1,0 +1,102 @@
+/* Brainrot Vault - design SVG léger, sans image PNG */
+:root {
+  --svg-grid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%2322e7ff' stop-opacity='.35'/%3E%3Cstop offset='1' stop-color='%23ff2f92' stop-opacity='.30'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 70 H140 M70 0 V140' stroke='url(%23g)' stroke-width='1' opacity='.45'/%3E%3Ccircle cx='70' cy='70' r='34' fill='none' stroke='url(%23g)' stroke-width='2' opacity='.55'/%3E%3Ccircle cx='25' cy='25' r='5' fill='%2322e7ff' opacity='.55'/%3E%3Ccircle cx='115' cy='110' r='6' fill='%23ffbf24' opacity='.55'/%3E%3C/svg%3E");
+  --svg-bolt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'%3E%3Cdefs%3E%3ClinearGradient id='b' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffbf24' stop-opacity='.70'/%3E%3Cstop offset='1' stop-color='%23ff2f92' stop-opacity='.50'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M88 5 34 68h38l-12 47 66-73H88z' fill='url(%23b)' opacity='.38'/%3E%3Ccircle cx='132' cy='22' r='8' fill='%2322e7ff' opacity='.45'/%3E%3Ccircle cx='25' cy='96' r='10' fill='%23a855ff' opacity='.42'/%3E%3C/svg%3E");
+  --svg-orbs: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='140' viewBox='0 0 180 140'%3E%3Cdefs%3E%3CradialGradient id='r1'%3E%3Cstop stop-color='%2322e7ff' stop-opacity='.70'/%3E%3Cstop offset='1' stop-color='%2322e7ff' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='r2'%3E%3Cstop stop-color='%23ff2f92' stop-opacity='.65'/%3E%3Cstop offset='1' stop-color='%23ff2f92' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='38' cy='36' r='34' fill='url(%23r1)'/%3E%3Ccircle cx='142' cy='94' r='42' fill='url(%23r2)'/%3E%3Cpath d='M15 115 C55 75 97 160 165 42' fill='none' stroke='%23ffffff' stroke-opacity='.20' stroke-width='2'/%3E%3C/svg%3E");
+  --svg-diamond: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='130' height='130' viewBox='0 0 130 130'%3E%3Cdefs%3E%3ClinearGradient id='d' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%236cff2b' stop-opacity='.50'/%3E%3Cstop offset='.5' stop-color='%2322e7ff' stop-opacity='.45'/%3E%3Cstop offset='1' stop-color='%23a855ff' stop-opacity='.45'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M65 9 122 65 65 121 8 65z' fill='none' stroke='url(%23d)' stroke-width='4' opacity='.62'/%3E%3Cpath d='M65 25 104 65 65 105 26 65z' fill='url(%23d)' opacity='.25'/%3E%3C/svg%3E");
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 15% 5%, rgba(168,85,255,.24), transparent 26%),
+    radial-gradient(circle at 85% 14%, rgba(34,231,255,.18), transparent 24%),
+    var(--svg-grid) !important;
+  background-size: auto, auto, 180px 180px !important;
+}
+
+.hero,
+.auth-card {
+  background-image:
+    linear-gradient(135deg, rgba(8,12,34,.88), rgba(5,8,22,.96)),
+    var(--svg-orbs) !important;
+  background-size: cover, 260px 210px !important;
+  background-position: center, right top !important;
+}
+
+.panel,
+.rarity-section,
+.brainrot-card,
+.summary-card {
+  background-image:
+    linear-gradient(145deg, rgba(11,18,46,.90), rgba(5,8,22,.96)),
+    var(--svg-grid) !important;
+  background-size: cover, 160px 160px !important;
+}
+
+.primary-btn,
+.fab,
+.install-button {
+  background-image:
+    linear-gradient(135deg, rgba(139,92,246,.96), rgba(255,47,146,.92)),
+    var(--svg-bolt) !important;
+  background-size: cover, 140px 110px !important;
+  background-position: center !important;
+}
+
+.ghost-btn,
+.soft-btn,
+.chip,
+.nav-btn.active,
+.mini-btn[data-lite-cases] {
+  background-image:
+    linear-gradient(135deg, rgba(34,231,255,.18), rgba(168,85,255,.20)),
+    var(--svg-orbs) !important;
+  background-size: cover, 170px 120px !important;
+}
+
+.versions-grid .slot-btn:nth-child(4n+1),
+.custom-slots-grid .slot-btn:nth-child(4n+1) {
+  background-image: linear-gradient(145deg, rgba(34,231,255,.24), rgba(5,8,22,.94)), var(--svg-orbs) !important;
+  border-color: rgba(34,231,255,.78) !important;
+}
+
+.versions-grid .slot-btn:nth-child(4n+2),
+.custom-slots-grid .slot-btn:nth-child(4n+2) {
+  background-image: linear-gradient(145deg, rgba(255,191,36,.26), rgba(5,8,22,.94)), var(--svg-bolt) !important;
+  border-color: rgba(255,191,36,.80) !important;
+}
+
+.versions-grid .slot-btn:nth-child(4n+3),
+.custom-slots-grid .slot-btn:nth-child(4n+3) {
+  background-image: linear-gradient(145deg, rgba(108,255,43,.20), rgba(5,8,22,.94)), var(--svg-diamond) !important;
+  border-color: rgba(108,255,43,.76) !important;
+}
+
+.versions-grid .slot-btn:nth-child(4n+4),
+.custom-slots-grid .slot-btn:nth-child(4n+4) {
+  background-image: linear-gradient(145deg, rgba(255,47,146,.24), rgba(5,8,22,.94)), var(--svg-grid) !important;
+  border-color: rgba(255,47,146,.80) !important;
+}
+
+.slot-thumb,
+.slot-placeholder {
+  background-image:
+    linear-gradient(135deg, rgba(5,8,22,.72), rgba(5,8,22,.92)),
+    var(--svg-diamond) !important;
+  background-size: cover, 120px 120px !important;
+}
+
+.cases-lite-sheet {
+  background-image:
+    linear-gradient(180deg, rgba(7,16,38,.90), rgba(5,8,22,.98)),
+    var(--svg-orbs) !important;
+  background-size: cover, 260px 180px !important;
+}
+
+.cases-lite-btn:nth-child(1) { background-image: linear-gradient(135deg, #00d4a6, #22e7ff), var(--svg-diamond) !important; }
+.cases-lite-btn:nth-child(2) { background-image: linear-gradient(135deg, #ffbf24, #ff7a18), var(--svg-bolt) !important; }
+.cases-lite-btn:nth-child(3) { background-image: linear-gradient(135deg, #8b5cf6, #c026ff), var(--svg-orbs) !important; }
+.cases-lite-btn:nth-child(4) { background-image: linear-gradient(135deg, #6cff2b, #21a80f), var(--svg-grid) !important; }
+.cases-lite-btn:nth-child(5) { background-image: linear-gradient(135deg, #2678ff, #1d4ed8), var(--svg-orbs) !important; }
+.cases-lite-btn:nth-child(6) { background-image: linear-gradient(135deg, #ff7a18, #db5a00), var(--svg-bolt) !important; }
+.cases-lite-btn:nth-child(7) { background-image: linear-gradient(135deg, #ff3d3d, #b91c1c), var(--svg-grid) !important; }
