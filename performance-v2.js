@@ -28,7 +28,7 @@
     t.textContent = message;
     t.classList.remove('hidden');
     clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.add('hidden'), 1600);
+    t._timer = setTimeout(() => t.classList.add('hidden'), 1500);
   }
 
   function addStyle() {
@@ -375,22 +375,18 @@
     document.addEventListener('pointercancel', () => clearTimeout(pressTimer), { passive: true });
   }
 
-  function autoLoadV4() {
-    if (document.querySelector('script[src="v4-premium-mobile.js"]')) return;
-    const script = document.createElement('script');
-    script.src = 'v4-premium-mobile.js?v=4';
-    script.defer = true;
-    document.body.appendChild(script);
+  function disableHeavyV4Autoload() {
+    window.BRAINROT_V4_DISABLED_FOR_TOUCH = true;
   }
 
   function boot() {
+    disableHeavyV4Autoload();
     addStyle();
     applyMode();
     lockHorizontalScroll();
     patchFileReaderCompression();
     addImageLightbox();
     addPerfToolbar();
-    autoLoadV4();
   }
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 80));
